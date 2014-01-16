@@ -1,0 +1,140 @@
+import org.apache.tools.ant.filters.ReplaceTokens
+
+apply plugin: 'war'
+apply plugin: 'jetty'
+apply plugin: 'groovy'
+apply plugin: 'maven'
+
+apply from: 'versions.gradle' 
+
+group = "edu.holycross.shot"
+version = "0.3.15"
+
+
+
+if (hasProperty('conf')) {
+    System.err.print "Using configuration data from ${conf}"
+    File confFile = new File(conf)
+    if (! confFile.exists()) {
+        throw new Exception("No configuration file ${conf} found.")
+    }
+    apply from: conf
+
+} else {
+    File confFile = new File("conf.gradle")
+    if (! confFile.exists()) {
+        throw new Exception("No configuration file ${conf} found.")
+    }
+    println "Using default configuration in 'conf.gradle'"
+    apply from: "conf.gradle"
+}
+
+
+if (hasProperty('pub')) {
+    System.err.print "Using configuration data from ${pub}"
+    File confFile = new File(pub)
+    if (! confFile.exists()) {
+        throw new Exception("No publication configuration file ${pub} found.")
+    }
+    apply from: pub
+
+} else {
+    File confFile = new File("pub.gradle")
+    if (! confFile.exists()) {
+        throw new Exception("No publication configuration file ${confFile} found.")
+    }
+    println "Using default configuration in 'pub.gradle'"
+    apply from: "pub.gradle"
+}
+
+
+
+repositories {
+    mavenCentral()
+    // for http builder:
+    maven {
+        url "http://repository.codehaus.org"
+    }
+    // for cite libs:
+    maven {
+        url "http://beta.hpcc.uh.edu/nexus/content/repositories/releases"
+    }
+    // for IBM Normalizer
+    maven {
+        url "https://oss.sonatype.org/content/repositories/releases"
+    }
+}
+
+
+configurations {
+    publib
+}
+
+
+task copyBuildPkg(type: Copy) {
+    from "pkg"
+    into "${buildDir}/citegraph-template"
+    filter(ReplaceTokens, tokens: [graphVersion : version])
+}
+
+task copyWeb(type: Copy) {
+    from "src/main/webapp"
+    into "${buildDir}/citegraph-template/src/main/webapp"
+}
+
+task buildTemplate(type: Zip, dependsOn: [copyBuildPkg, copyWeb] ) {
+    classifier = "template"
+    from "${buildDir}/citegraph-template"
+}
+
+
+
+dependencies {
+    groovy group: 'org.codehaus.groovy', name: 'groovy-all', version: groovyVersion
+    compile  group: 'org.codehaus.groovy.modules.http-builder', name: 'http-builder', version: '0.5.2'
+    compile group: 'edu.harvard.chs', name : 'cite' , version: citeVersion
+
+    runtime  group: 'org.codehaus.groovy.modules.http-builder', name: 'http-builder', version: '0.5.2'
+    runtime group: 'edu.harvard.chs', name : 'cite' , version: citeVersion
+
+
+
+    testCompile group: 'junit', name: 'junit', version: junitVersion
+    testCompile group :'xmlunit', name: 'xmlunit', version: xmlunitVersion
+    testCompile group: 'com.ibm.icu', name: 'icu4j', version: icu4jVersion
+}
+
+
+
+httpPort = 8889
+stopPort = 9452
+stopKey = 'foo'
+
+
+
+
+artifacts {
+    publib jar
+}
+
+
+
+uploadPublib {
+    repositories.mavenDeployer {
+        repository(url: nexusRepo) {                   
+            authentication (userName: nexusUser, password: nexusPassword)
+        }
+    }
+    doLast {
+        System.err.println "Used ${nexusRepo} to publish."
+    }
+        
+}
+//uploadPublib.onlyIf { (project.hasProperty('nexusRepo') && project.hasProperty('nexusUser') && project.hasProperty('nexusPassword')) }
+
+
+
+war {
+  filter(ReplaceTokens, tokens: [tripleserver: tripleserver])
+}
+

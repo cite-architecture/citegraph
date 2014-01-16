@@ -1,0 +1,12 @@
+/*
+
+Configuration of dsegraph
+
+*/
+
+project.ext {
+	    /* SPARQL end point */
+    //tripleserver = "localhost:3030/ds/"
+    tripleserver = "beta.hpcc.uh.edu:3030/ds/"
+
+}
