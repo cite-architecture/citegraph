@@ -1,8 +1,8 @@
-# `dsegraph` #
+# `citegraph` #
 
 Access a scholarly graph by urn.
 
-Optionally, receive reply as RDF or simplified `dsegraph` xml.
+Optionally, receive reply as RDF or simplified `citegraph` xml.
 
 Boolean flag to query inclusive or specific.
 
