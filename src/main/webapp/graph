@@ -1,0 +1,92 @@
+import edu.harvard.chs.dsegraph.DseGraph
+import edu.harvard.chs.dsegraph.DseDefinitions
+
+/*
+Servlet wrapping the HMT Graph object.
+*/
+
+
+DseDefinitions.ReplyFormat format = DseDefinitions.ReplyFormat.HMTXML
+String contentType = "text/xml"
+
+switch(request.getParameter("format")) {
+    case "json":
+        format = DseDefinitions.ReplyFormat.JSON
+//    contentType = "application/json"
+    contentType = "text/plain"
+    break
+}
+
+
+response.setContentType(contentType)
+response.setHeader( "Access-Control-Allow-Origin", "*")
+
+String urn = ""
+
+
+if (request.getParameter("urn")) {
+    urn = request.getParameter("urn")
+    DseGraph dseg = new DseGraph("http://localhost:3030/ds/")
+    String xsl
+    def citationType = dseg.determineCitationType(urn)
+    switch (citationType) {
+        case DseDefinitions.CitationType.CTSRANGE:
+        case DseDefinitions.CitationType.CTSPASSAGE:
+            xsl = "xslt/text.xsl"
+        break
+        case DseDefinitions.CitationType.CITEIMG:
+            xsl = "xslt/image.xsl"
+        break
+        case DseDefinitions.CitationType.CITEOBJECT:
+            xsl = "xslt/object.xsl"
+        break
+        default:
+            xsl = "xslt/object.xsl"
+        break
+    }
+
+    switch (format) {
+        case DseDefinitions.ReplyFormat.RDF:
+            println "RDF XML output not yet implemented."
+        break
+
+
+        case DseDefinitions.ReplyFormat.JSON:
+            println hmtg.findAdjacent(urn, format)
+        break
+        
+        case DseDefinitions.ReplyFormat.HMTXML:
+    try {
+
+        println """<?xml-stylesheet type="text/xsl" href="${xsl}"?>"""
+        println """
+<citegraph xmlns='http://chs.harvard.edu/xmlns/citeindex'>
+<request><urn>${urn}</urn>
+<sparqlEndPoint>${dseg.tripletServerUrl}</sparqlEndPoint>
+</request>
+<reply>
+${dseg.findAdjacent(urn)}
+</reply>
+</citegraph>
+"""
+} catch(Exception e) {
+//        println """<?xml-stylesheet type="text/xsl" href="${errorxsl}"?>
+        println """
+<error xmlns='http://chs.harvard.edu/xmlns/citeindex'>
+URN ${urn} generated an error.
+Error: ${e}
+</error>
+"""
+}
+            break
+    }
+
+} else {
+//        println """<?xml-stylesheet type="text/xsl" href="${homexsl}"?>
+        println """
+<error xmlns='http://chs.harvard.edu/xmlns/citeindex'>
+Parameter 'urn' is required
+</error>
+"""
+}
+

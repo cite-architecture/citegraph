@@ -1,0 +1,61 @@
+String demoUrn = "urn:cite:ecod:codbod8.cb-0008_002r"
+
+html.html {
+    head {
+        title("DSE: graph")
+        link(rel: "stylesheet", href: "css/normalize.css")
+        link(rel: "stylesheet", href: "css/simple.css") 
+        link(rel: "stylesheet", href: "css/dsegraph.css") 
+        link(rel: "stylesheet", href: "css/home.css")
+        
+    }
+    
+    body {
+    
+    	header {
+			h1("DSE: graph")
+    	}
+    	
+    	article {
+            
+            p {
+                mkp.yield "For visitors who are unfamiliar with the URN-format for citing digital texts and objects: "
+			
+                a(href: "http://www.homermultitext.org/hmt-doc/guides/urn-gentle-intro.html", "A Gentle Introduction to CTS and CITE URNs")
+            }
+            
+            section {
+                h2("Navigate a project's web of objects")
+				
+				
+                form(action: 'graph') {
+                    input (name : 'urn', size: '80', value : "${demoUrn}")
+                    
+                    label(for: 'format', "format")
+                    select(name: 'format', id : 'format') {
+                        option(value: 'hmtxml', selected: 'selected', "HMT XML")
+                        option(value: 'json', "JSON")
+                        option(value: 'rdfxml', "RDF NOT YET IMPLEMENTED") 
+                    }
+
+                    input (type: 'submit', value : 'Find related material')
+                }
+            }
+            
+            
+            footer {
+		
+                p {
+                    a(href: "http://www.homermultitext.org", "The Homer Multitext.")
+                    mkp.yield "Casey Dué &amp; Mary Ebbott, editors; Christopher Blackwell &amp; Neel Smith, project architects."
+			
+                    a(href: "http://chs.harvard.edu", "The Center for Hellenic Studies")
+			
+                    mkp.yield " 3100 Whitehaven Street, NW. Washington, DC 20008 202-745-4400. All data are copyrighted to their owners and licensed for non-commercial, scholarly use under a Creative Commons Attribution-Noncommercial-Share Alike License. All source-code is licensed under the General Public License. Material on this site is based upon work supported by the National Science Foundation under Grants No. 0916148 &amp; No. 0916421. Any opinions, findings and conclusions or recomendations expressed in this material are those of the author(s) and do not necessarily reflect the views of the National Science Foundation (NSF)."
+           
+        	}
+                
+            }
+        }
+    }
+}
