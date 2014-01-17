@@ -1,0 +1,37 @@
+import org.apache.tools.ant.filters.ReplaceTokens
+
+apply plugin: 'war'
+apply plugin: 'jetty'
+apply plugin: 'groovy'
+
+apply from: "conf.gradle"
+
+String groovyVersion = "2.0.6"
+
+repositories {
+    mavenCentral()
+    // for http builder:
+    maven {
+        url "http://repository.codehaus.org"
+    }
+    maven {
+        url "http://beta.hpcc.uh.edu/nexus/content/repositories/releases"
+    }
+}
+
+dependencies {
+    groovy group: 'org.codehaus.groovy', name: 'groovy-all', version: groovyVersion
+    compile group: 'edu.holycross.shot', name : 'citegraph' , version: graphVersion
+    runtime group: 'edu.holycross.shot', name : 'citegraph' , version: graphVersion
+}
+
+httpPort = 8080
+stopPort = 9451
+stopKey = 'foo'
+
+war {
+    filter(ReplaceTokens, tokens: [tripleserver: tripleserver])
+    classpath sourceSets.main.output.classesDir
+    classpath configurations.runtime
+}
+

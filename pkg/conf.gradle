@@ -1,0 +1,10 @@
+/*
+
+Configuration of citegraph
+*/
+
+project.ext {
+    tripleserver = "localhost:3030/ds/"
+
+    graphVersion = "@graphVersion@"
+}
