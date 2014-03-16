@@ -25,9 +25,10 @@ return """select ?s where {
     * @returns Text of a SPARQL query.
     */
     String labelQuery(String urnStr) {
-        String q = """select ?s ?o where {
-?s  <http://www.w3.org/1999/02/22-rdf-syntax-ns#label> ?o .
-  FILTER(str(?s) = "${urnStr}") .
+        String q = """
+select ?s ?o where {
+		BIND ( <${urnStr}> as ?s )
+		?s  <http://www.w3.org/1999/02/22-rdf-syntax-ns#label> ?o .
 }
 """
     return q
@@ -55,14 +56,13 @@ select ?s ?o where {
       return """
 ${prefix}
 select ?s ?v ?o ?lab where {
+BIND (<${urnStr}> as ?s )
 {  ?s ?v ?o .
   ?o rdf:label ?lab .
-  FILTER(str(?s) = "${urnStr}") .
 } UNION {
 ?s ?v ?o . 
 ?o cite:isExtendedRef  ?par .
 ?par rdf:label ?lab .
-  FILTER(str(?s) = "${urnStr}") .
 }
 }
 """
@@ -81,32 +81,31 @@ select ?s ?v ?o ?lab where {
 ${prefix}
 
 select ?s ?v ?o ?lab where {
- { ?s ?v ?o .
+ { 
+   BIND (<${urnStr}> as ?s )
+		?s ?v ?o .
    ?o rdf:label ?lab .
-  
-
-  FILTER(str(?s) = "${urnStr}") . 
 
 } UNION  { 
+   BIND (<${urnStr}> as ?s )
    ?s <http://www.homermultitext.org/cite/rdf/isExtendedRef> ?trimmed .
    ?trimmed ?v ?o .
    ?o rdf:label ?lab .
-  FILTER(str(?s) = "${urnStr}") . 
 
 } UNION {
+   BIND (<${urnStr}> as ?s )
 ?s ?v ?o . 
 ?o cite:isExtendedRef  ?par .
 ?par rdf:label ?lab .
-  FILTER(str(?s) = "${urnStr}") .
 
 
 
 } UNION  { 
+   BIND (<${urnStr}> as ?trimmed )
   ?trimmed <http://www.homermultitext.org/cite/rdf/hasExtendedRef>  ?s .
   ?s ?v ?o .
   ?o rdf:label ?lab .
 
-  FILTER(str(?trimmed) = "${urnStr}") . 
   FILTER (str(?v) != "http://www.homermultitext.org/cite/rdf/isExtendedRef") .
  }
 
@@ -127,10 +126,10 @@ select ?s ?v ?o ?lab where {
         return """
 ${prefix}
 select ?s ?v ?o ?nxt ?lab where {
+  BIND(<${urnStr}> as ?s )
    ?s ?v ?o .
   ?o  <http://www.homermultitext.org/cts/rdf/hasSequence>   ?nxt .
   ?o rdf:label ?lab .
-  FILTER(str(?s) = "${urnStr}") .
 }
 ORDER BY ?nxt 
 """
@@ -141,10 +140,10 @@ String sequencedObjects(String urnStr) {
         return """
 ${prefix}
 select ?s ?v ?o ?nxt ?lab where {
+  BIND(<${urnStr}> as ?s )
  ?s ?v ?o .
   ?o  <http://purl.org/ontology/olo/core#item> ?nxt .
   ?o rdf:label ?lab .
-  FILTER(str(?s) = "${urnStr}") .
 
 }
 ORDER BY ?nxt 
@@ -157,12 +156,12 @@ ORDER BY ?nxt
         return """
 ${prefix}
 select ?s ?v ?o ?nxt ?lab where {
+  BIND(<${urnStr}> as ?trimmed)
    ?trimmed <http://www.homermultitext.org/cite/rdf/hasExtendedRef>  ?s .
    ?s ?v ?o .
    ?o rdf:label ?lab .
    ?o  <http://www.homermultitext.org/cts/rdf/hasSequence>    ?nxt .
   FILTER (str(?v) != "http://www.homermultitext.org/cite/rdf/isExtendedRef") . 
-  FILTER(str(?trimmed) = "${urnStr}") . 
 }
 ORDER BY ?nxt
 """
@@ -172,12 +171,12 @@ String inclusiveSequencedObjects(String urnStr) {
         return """
 ${prefix}
 select ?s ?v ?o ?nxt ?lab where {
+  BIND(<${urnStr}> as ?trimmed)
    ?trimmed <http://www.homermultitext.org/cite/rdf/hasExtendedRef>  ?s .
    ?s ?v ?o .
    ?o rdf:label ?lab .
    ?o  <http://purl.org/ontology/olo/core#item>   ?nxt .
   FILTER (str(?v) != "http://www.homermultitext.org/cite/rdf/isExtendedRef") . 
-  FILTER(str(?trimmed) = "${urnStr}") . 
 }
 ORDER BY ?nxt
 """
