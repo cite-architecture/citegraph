@@ -55,20 +55,14 @@ class CiteGraph {
     * @returns The text of the reply from the SPARQL endpoint.
     */
     String getSparqlReply(String acceptType, String query) {
-        String replyString
         def encodedQuery = URLEncoder.encode(query)
         def q = "${tripletServerUrl}query?query=${encodedQuery}"
         if (acceptType == "application/json") {
             q +="&output=json"
         }
-        def http = new HTTPBuilder(q)
-        http.request( Method.GET, ContentType.TEXT ) { req ->
-            headers.Accept = acceptType
-            response.success = { resp, reader ->
-                replyString = reader.text
-            }
-        }
-        return replyString
+
+		URL queryUrl = new URL(q)
+        return queryUrl.getText("UTF-8")
     }
 
     /** Finds all relations to a given object
