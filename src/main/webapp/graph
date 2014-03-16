@@ -1,17 +1,17 @@
-import edu.harvard.chs.dsegraph.DseGraph
-import edu.harvard.chs.dsegraph.DseDefinitions
+import edu.harvard.chs.citegraph.CiteGraph
+import edu.harvard.chs.citegraph.CiteDefinitions
 
 /*
 Servlet wrapping the HMT Graph object.
 */
 
 
-DseDefinitions.ReplyFormat format = DseDefinitions.ReplyFormat.HMTXML
+CiteDefinitions.ReplyFormat format = CiteDefinitions.ReplyFormat.HMTXML
 String contentType = "text/xml"
 
 switch(request.getParameter("format")) {
     case "json":
-        format = DseDefinitions.ReplyFormat.JSON
+        format = CiteDefinitions.ReplyFormat.JSON
 //    contentType = "application/json"
     contentType = "text/plain"
     break
@@ -26,18 +26,18 @@ String urn = ""
 
 if (request.getParameter("urn")) {
     urn = request.getParameter("urn")
-    DseGraph dseg = new DseGraph("http://localhost:3030/ds/")
+    CiteGraph dseg = new CiteGraph("http://localhost:3030/hmt/")
     String xsl
     def citationType = dseg.determineCitationType(urn)
     switch (citationType) {
-        case DseDefinitions.CitationType.CTSRANGE:
-        case DseDefinitions.CitationType.CTSPASSAGE:
+        case CiteDefinitions.CitationType.CTSRANGE:
+        case CiteDefinitions.CitationType.CTSPASSAGE:
             xsl = "xslt/text.xsl"
         break
-        case DseDefinitions.CitationType.CITEIMG:
+        case CiteDefinitions.CitationType.CITEIMG:
             xsl = "xslt/image.xsl"
         break
-        case DseDefinitions.CitationType.CITEOBJECT:
+        case CiteDefinitions.CitationType.CITEOBJECT:
             xsl = "xslt/object.xsl"
         break
         default:
@@ -46,16 +46,16 @@ if (request.getParameter("urn")) {
     }
 
     switch (format) {
-        case DseDefinitions.ReplyFormat.RDF:
+        case CiteDefinitions.ReplyFormat.RDF:
             println "RDF XML output not yet implemented."
         break
 
 
-        case DseDefinitions.ReplyFormat.JSON:
-            println hmtg.findAdjacent(urn, format)
+        case CiteDefinitions.ReplyFormat.JSON:
+            println CiteGraph.findAdjacent(urn)
         break
         
-        case DseDefinitions.ReplyFormat.HMTXML:
+        case CiteDefinitions.ReplyFormat.HMTXML:
     try {
 
         println """<?xml-stylesheet type="text/xsl" href="${xsl}"?>"""

@@ -1,4 +1,4 @@
-String demoUrn = "urn:cite:ecod:codbod8.cb-0008_002r"
+String demoUrn = "urn:cite:hmt:vaimg.VA095VN-0598"
 
 html.html {
     head {
