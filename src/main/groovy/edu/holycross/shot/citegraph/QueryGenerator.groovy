@@ -57,12 +57,19 @@ select ?s ?o where {
 ${prefix}
 select ?s ?v ?o ?lab where {
 BIND (<${urnStr}> as ?s )
-{  ?s ?v ?o .
-  ?o rdf:label ?lab .
+{  
+
+?s ?v ?justThisO .
+BIND(?justThisO as ?o).
+?o rdf:label ?lab .
+
 } UNION {
-?s ?v ?o . 
+
+?s ?v ?justThisO . 
+BIND(?justThisO as ?o).
 ?o cite:isExtendedRef  ?par .
 ?par rdf:label ?lab .
+
 }
 }
 """
@@ -81,29 +88,35 @@ BIND (<${urnStr}> as ?s )
 ${prefix}
 
 select ?s ?v ?o ?lab where {
- { 
-   BIND (<${urnStr}> as ?s )
-		?s ?v ?o .
+ { <${urnStr}> ?v ?justThisO .
+   BIND(<${urnStr}> as ?s) .
+   BIND(?justThisO as ?o).
    ?o rdf:label ?lab .
 
-} UNION  { 
-   BIND (<${urnStr}> as ?s )
-   ?s <http://www.homermultitext.org/cite/rdf/isExtendedRef> ?trimmed .
-   ?trimmed ?v ?o .
+
+} UNION  {
+   <${urnStr}> <http://www.homermultitext.org/cite/rdf/isExtendedRef> ?trimmed .
+   BIND(<${urnStr}> as ?s) .
+   ?trimmed ?v ?justThisO .
+   BIND(?justThisO as ?o).
    ?o rdf:label ?lab .
+ 
 
 } UNION {
-   BIND (<${urnStr}> as ?s )
-?s ?v ?o . 
+<${urnStr}> ?v ?justThisO .
+   BIND(<${urnStr}> as ?s) .
+   BIND(?justThisO as ?o).
 ?o cite:isExtendedRef  ?par .
+
 ?par rdf:label ?lab .
 
 
 
-} UNION  { 
-   BIND (<${urnStr}> as ?trimmed )
-  ?trimmed <http://www.homermultitext.org/cite/rdf/hasExtendedRef>  ?s .
-  ?s ?v ?o .
+} UNION  {
+  <${urnStr}> <http://www.homermultitext.org/cite/rdf/hasExtendedRef>  ?s .
+   BIND(<${urnStr}> as ?trimmed) .
+  ?s ?v ?justThisO .
+   BIND(?justThisO as ?o).
   ?o rdf:label ?lab .
 
   FILTER (str(?v) != "http://www.homermultitext.org/cite/rdf/isExtendedRef") .
@@ -127,11 +140,13 @@ select ?s ?v ?o ?lab where {
 ${prefix}
 select ?s ?v ?o ?nxt ?lab where {
   BIND(<${urnStr}> as ?s )
-   ?s ?v ?o .
+   ?s ?v ?justThisO .
+   BIND(?justThisO as ?o).
   ?o  <http://www.homermultitext.org/cts/rdf/hasSequence>   ?nxt .
   ?o rdf:label ?lab .
 }
 ORDER BY ?nxt 
+
 """
 }
 
@@ -141,7 +156,8 @@ String sequencedObjects(String urnStr) {
 ${prefix}
 select ?s ?v ?o ?nxt ?lab where {
   BIND(<${urnStr}> as ?s )
- ?s ?v ?o .
+ ?s ?v ?justThisO .
+  BIND(?justThisO as ?o).
   ?o  <http://purl.org/ontology/olo/core#item> ?nxt .
   ?o rdf:label ?lab .
 
@@ -158,7 +174,8 @@ ${prefix}
 select ?s ?v ?o ?nxt ?lab where {
   BIND(<${urnStr}> as ?trimmed)
    ?trimmed <http://www.homermultitext.org/cite/rdf/hasExtendedRef>  ?s .
-   ?s ?v ?o .
+   ?s ?v ?to .
+   BIND(?to as ?o).
    ?o rdf:label ?lab .
    ?o  <http://www.homermultitext.org/cts/rdf/hasSequence>    ?nxt .
   FILTER (str(?v) != "http://www.homermultitext.org/cite/rdf/isExtendedRef") . 
@@ -173,7 +190,8 @@ ${prefix}
 select ?s ?v ?o ?nxt ?lab where {
   BIND(<${urnStr}> as ?trimmed)
    ?trimmed <http://www.homermultitext.org/cite/rdf/hasExtendedRef>  ?s .
-   ?s ?v ?o .
+   ?s ?v ?to .
+   BIND(?to as ?o).
    ?o rdf:label ?lab .
    ?o  <http://purl.org/ontology/olo/core#item>   ?nxt .
   FILTER (str(?v) != "http://www.homermultitext.org/cite/rdf/isExtendedRef") . 

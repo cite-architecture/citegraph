@@ -26,7 +26,7 @@ String urn = ""
 
 if (request.getParameter("urn")) {
     urn = request.getParameter("urn")
-    CiteGraph dseg = new CiteGraph("http://localhost:3030/hmt/")
+    CiteGraph dseg = new CiteGraph("@tripleserver@")
     String xsl
     def citationType = dseg.determineCitationType(urn)
     switch (citationType) {
