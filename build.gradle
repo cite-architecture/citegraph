@@ -8,7 +8,7 @@ apply plugin: 'maven'
 apply from: 'versions.gradle' 
 
 group = "edu.holycross.shot"
-version = "0.5.0"
+version = "0.5.1"
 
 
 
