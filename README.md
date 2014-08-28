@@ -1,4 +1,4 @@
-# `citegraph` #
+# `citegraph` 
 
 Access a scholarly graph by urn.
 
